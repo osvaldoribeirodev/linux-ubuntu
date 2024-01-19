@@ -1,0 +1,259 @@
+Comandos Linux
+
+# Arquivo Dockerfile para criar um container com acesso ssh #
+
+FROM ubuntu:latest
+RUN apt-get update && apt-get install -y openssh-server
+RUN mkdir /var/run/sshd
+# Set root password for SSH access (change 'your_password' to your desired password)
+RUN echo 'root:senha@123' | chpasswd
+RUN sed -Ei 's/#(PermitRootLogin).+/\1 yes/' /etc/ssh/sshd_config
+RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
+
+# ------------ #
+
+
+Obs: Utilizamos o comando "sudo" para executar tarefas administrativas. Quando estamos logados com o root, não tem necessidade.
+
+Rodar um container linux
+	docker run -d -p 2222:22 --name ubuntu-labs ubuntulabs
+
+Instalar/Atualizar o apt (gerenciador de pacotes)
+	sudo apt update
+	
+Conectar via ssh
+	ssh root@localhost -p 2222
+	// inserir a senha
+
+Instalar o iprout2
+	sudo apt-get install iproute2
+
+Verificar o ip
+	ip addr
+
+Instalar o servidor SSH
+	sudo apt install openssh-server
+
+Criando um novo usuario
+	sudo adduser oribeiro
+	// informar a senha e confirmar: senha@123
+	// informar informações adicionais
+
+	Atribuindo o novo usuario a user group sudo
+		usermod -aG sudo oribeiro
+
+	Verificando o usuario	
+		id oribeiro
+	
+	Testando o usuario
+		su - oribeiro
+
+
+root@"ip,container,maquina":~"#,$"
+	O primeiro ponto para entendermos é o seguinte: essa linha toda aqui já é, às vezes, um mistério para boa parte das pessoas. 
+	Essa linha é simples: estamos no Shell e dentro desse Shell, por default, o Ubuntu usa o Bash.
+	O Bash é um tipo de Shell, o mais utilizado hoje em dia, existem outros.
+	Aqui ele nos mostra o seguinte: o nome do usuário que estou utilizando, seguido do ‘@’, nome do host.
+	Seguindo aqui ‘’, que significa o quê? O ‘’ significa a minha home, e esse "$" significa que é um usuário não privilegiado, 
+	se fosse root você ia ler o "#" aquele símbolo que identifica aqui o root.
+
+Exibir o caminho corrente
+	pwd
+
+Listar o conteudo
+	ls
+	ls -a : listar todo o conteudo do diretorio inclusive arquivos ocultos
+	ls -al: listar todo o conteudo do diretorio inclusive arquivos ocultos com detalhes como tamanho, local, etc
+		ll: atalho para ls -al
+	ls -lh /swap.img: exibir o detalhe do arquivo em formato humano
+	ls --help: exibir todos os comandos possíveis para o ls
+	
+	arquivos ocultos começam com "."
+	man ls: acessar o manual do comando e para sair digitar q
+	Globbing
+		ls arq*: listar todos os arquivos que comecem com arq
+		ls arq?: listar todos os arquivos que comecem com arq possuam mais uma casa decimal
+		ls arq??: listar todos os arquivos que comecem com arq possuam mais duas casas decimais
+		ls ???[1-5]: listar os arquivos que comecem com 3 caracteres e o 4 está entre 1 e 5
+		ls ???[1,5]: listar os arquivos que comecem com 3 caracteres e o 4 é 1 ou 5
+		ls [A,a]rq	[1,5]: listar os arquivos que comecem com Arq ou arq e o 4 é 1 ou 5
+		ls *1*: listar todos os arquivos que contenham o 1 em sua descrição		
+
+Criar um arquivo
+	touch teste.arq
+	touch arq1
+	touch arq1 arq2
+	touch .arq1: arquivo oculto
+
+Excluindo arquivos
+	rm arq2
+	rm arq2 arq3
+
+Limpar a tela
+	clear ou ctrl+l
+
+Navegar nos diretorios
+	cd ou cd ~: vai para a home do usurio
+	cd ~/labs: vai direto para o diretorio labs
+	cd /etc: vai para o diretorio etc (o diretorio etc é o local onde ficam os aquivos de configuração do sistema)
+	cd /: caminho completo (path completo) da navegação. Utilizando o barra, para navegar presisamos informar o caminho completo: cd /home/oribeiro
+	cd -: alternar entre o diretorio atual e o diretorio acessado anteriormente
+	cd ..: ir para o parent
+	cd ../../: voltando aos diretorios anteriores
+
+Criando diretorios
+	mkdir labs
+	Criando uma estrutura de diretorios
+		mkdir -p dir1/dir2
+	Criando diretorios com espaço no nome
+		mkdir diretorio\ 1
+		mkdir diretorio\ 1 diretorio\ 2
+
+Excluindo diretorios
+	rmdir "diretorio"
+	rm -r(recursive) dir1: vai excluir o dir1 e tudo dentro dele. Em alguns momentos alguns tipos de arquivos podem não excluídos devido a sua importância.
+	rm -rf: vai excluir o dir1 e TUDO dentro dele.
+	
+Copiar todo o conteudo de um diretorio para outro estando dentro do diretorio de origem
+	cp -r * ../dir2 (nesse caso o dir2 está na mesmo estrutura que o dir1)
+
+Copiar todo o conteudo de um diretorio para outro estando fora do diretorio de origem
+	cp -r dir1/* dir2
+
+Copiar todo o conteudo de um diretorio para um diretorio inexistente
+	cp -r dir1 dir3
+
+Copiar determinado arquivo de um determinado diretorio para o diretorio corrente
+	Copiando o arquivo password do diretorio "etc" para o diretorio corrente "."
+	cp /etc/password .
+	
+Copiar determinado arquivo de um determinado diretorio para o diretorio corrente renomeando o arquivo
+	Copiando o arquivo password do diretorio "etc" para o diretorio corrente "."
+	cp /etc/password password2
+	origem			 destino
+
+Renomear um diretorio
+	mv dir1 dir4
+
+Renomear um arquivo
+	mv arq1 arq4
+
+Mover todo o conteudo de um diretorio para outro estando fora do diretorio de origem.
+No caso do comando "mv" não precisamos utilizar o -r pois ele já trabalha com recursividade.
+	mv dir1/* dir4
+
+Mover todo o conteudo de um diretorio para outro estando dentro do diretorio de origem	
+	mv * ../dir4
+
+Listar o histórico de comandos executados
+	history
+
+Exibir o conteudo de um arquivo
+	cat "arquivo"
+	
+Exibir o conteudo específico de um arquivo
+	grep "conteudo" "arquivo" -> grep http services: exibe todas as linhas do arquivo que contenham o texto http
+
+Exibir o conteudo específico de vários arquivos
+	grep "conteudo" * -> grep http services: exibe todas as linhas dos arquivos que contenham o texto http	
+
+Exibir o conteudo específico de um arquivo ignorando o sensitive case
+	grep "conteudo" -i "arquivo" -> grep http services: exibe todas as linhas dos arquivos que contenham o texto http ou HTTP
+
+Exibir os arquivos que contenham um determinado conteudo
+	grep -l "conteudo" *
+
+Exibir os arquivos que não contenham um determinado conteudo
+	grep -L "conteudo" *	
+
+Exibir os arquivos que contenham um determinado conteudo em todos os diretorios utilizando recursividade
+	grep -r "conteudo" *
+
+Paginando o resultado de conteudo dos arquivos
+	more "arquivo" -> pressionando o "espaço", a paginação é feita página a página
+					  pressionando o "enter", a paginação avança linha a linha
+					  pressionando o "b", a paginação é retornada
+					  pressionando o "q", a paginação é abandonada
+	less "arquivo" -> usando igualmente ao more, porem podemos utilizar as setas do teclado para avançar e/ou retroceder
+
+Visualizar as 10 últimas linhas do arquivo	
+	tail "arquivo"
+
+Visualizar as 3 últimas linhas do arquivo	
+	tail -n 3 "arquivo"	
+	
+Visualizar as 10 primeiras linhas do arquivo	
+	tail "arquivo"	
+
+Localizar aquivos dentro dos diretorios
+	find / -name *.conf -> buscar todos os arquivos com a extensão .conf
+
+Localizar aquivos dentro dos diretorios com privilegios de admin
+	sudo find / -name *.conf -> buscar todos os arquivos com a extensão .conf	
+	
+Localizar aquivos dentro dos diretorios até 2 subdiretórios
+	find / -maxdepth 2 -name *.conf -> buscar todos os arquivos com a extensão .conf	
+
+Localizar aquivos dentro dos diretorios que foram criados a 5 minutos
+	find / -amin -5
+
+Localizar aquivos dentro dos diretorios que foram criados a 2 dias
+	find / -atime -2
+
+Localizar aquivos dentro dos diretorios maiores que 100 mb
+	find / -size +100M	
+
+Extraindo um conteúdo específico de um arquivo para um novo arquivo
+	grep Port ssh_config > listagem.txt -> criar um novo arquivo com o nome de listagem.txt 
+										   incluindo nele tudo que contenha Port, que está 
+										   sendo copiado do arquivo ssh_config. Se repetirmos
+										   o comando localizando outra palavra, o arquivo
+										   listagem.txt será recriado pois estamos utilizando o
+										   comando grep seguido de ">".
+
+Adicionar um conteúdo específico de um arquivo para um arquivo existente
+	grep Tunnel ssh_config >> listagem.txt -> se utilizarmos o comando grep seguido de ">>",
+											  conseguimos adicionar informações a um arquivo existente.
+											  Caso o arquivo não exista, esse será criado.
+
+Concatenar comandos
+	cat /etc/passwd | grep oribeiro -> com essa concatenação, conseguimos exibir o conteúdo de um arquivo
+									   e localizar um conteúdo específico
+	
+	cat /etc/passwd | grep oribeiro > listagem_usuarios -> além exibir podemos incluir o que foi exibido em
+														   outro arquivo
+
+Exibir o conteúdo de um arquivo de forma ordenada
+	cat listagem.txt | sort -> onde a saída do comando cat é concatenada com o comando sort
+
+Extraindo um conteúdo específico de um arquivo para um novo arquivo de forma ordenada
+	cat listagem.txt | sort > listagem2.txt
+
+Filtrar as ultimas 5 linhas do arquivo de log que contenham um conteudo especifico
+	tail -n 5 alternatives.log | grep "link group"
+	
+Gerar um novo arquivo com as ultimas 5 linhas do arquivo de log
+	tail -n 5 alternatives.log | grep "link group" > log5.txt (caso ocorra erro de permissão, redirecionar 
+															   para um diretório com permissão)
+	tail -n 5 alternatives.log | grep "link group" | sort > ~/labs/redirecionamento/log5.txt  
+		(adicionando o sort, o arquivo será criado com o conteúdo ordenado)
+
+Contar a quantidade de linhas, palavras e a informação em bytes de um arquivo
+	cat ssh_config | wc
+
+Contar a quantidade de linhas
+	cat ssh_config | wc -l
+
+Separando as colunas de um arquivo utilizando um separador
+	cat "arquivo" | cut -d " " -f1 -> obtendo a primeira coluna do arquivo
+
+Separando as colunas de um arquivo utilizando um separador, a partir de uma coluna específica até o final do arquivo
+	cat "arquivo" | cut -d " " -f3-
+
+Separando as colunas de um arquivo utilizando um separador, a partir de um range de colunas
+	cat "arquivo" | cut -d " " -f3-f6
+	
+Separando as colunas de um arquivo utilizando um separador, a partir de um range inicial e depois um final de colunas
+	cat "arquivo" | cut -d " " -f1-3,6-
