@@ -178,14 +178,17 @@ Paginando o resultado de conteudo dos arquivos
 					  pressionando o "q", a paginação é abandonada
 	less "arquivo" -> usando igualmente ao more, porem podemos utilizar as setas do teclado para avançar e/ou retroceder
 
+Visualizar as 10 primeiras linhas do arquivo	
+	head "arquivo"
+
+Visualizar as 50 primeiras linhas do arquivo	
+	head -50 "arquivo"
+
 Visualizar as 10 últimas linhas do arquivo	
 	tail "arquivo"
 
 Visualizar as 3 últimas linhas do arquivo	
 	tail -n 3 "arquivo"	
-	
-Visualizar as 10 primeiras linhas do arquivo	
-	tail "arquivo"	
 
 Localizar aquivos dentro dos diretorios
 	find / -name *.conf -> buscar todos os arquivos com a extensão .conf
@@ -257,3 +260,90 @@ Separando as colunas de um arquivo utilizando um separador, a partir de um range
 	
 Separando as colunas de um arquivo utilizando um separador, a partir de um range inicial e depois um final de colunas
 	cat "arquivo" | cut -d " " -f1-3,6-
+
+Trabalhando com Regex	
+	Precisamos instalar o pacote "wamerican" que contem um arquivo com muitas palavras onde faremos as nossas buscas
+		sudo apt install wamerican
+	Vamos copiar o arquivo american-english para uma estrutura de estudos
+		mkdir labs/expressoes_regulares
+		cp /usr/share/dict/american-english .		
+	Vamos procurar a palavra computer
+		cat american-english | grep computer
+	Usando a expressão regular para melhorar a buscar. Utilizamos o parâmetro "-E"
+	Buscar tudo que começa com computer:
+		cat american-english | grep -E "^computer"
+	Buscar tudo que começa terminar com computer:
+		cat american-english | grep -E "computer$"
+	Buscar extamente a palavra computer:
+		cat american-english | grep -E "^computer$"		
+	Vamos acrescentar a palavra "Computer" para trabalhar com case sensitive
+		echo "Computer" >> american-english
+		grep -i computer american-english
+	Buscar extamente a palavra computer com case insensitive:
+		cat american-english | grep -iE "^computer$"
+	Podemos substituir o grep -E por egrep
+		egrep "^computer$" american-english
+	Buscar por uma ou outra palavra
+		cat american-english | grep -iE "^smartphone$|^computer$"
+	Buscar palavras cujo a primeira letra pode ser qualquer letra e em seguida tenha "oot"
+		egrep "^.oot" american-english
+	Buscar palavras cujo a primeira letra pode ser qualquer letra e em seguida termine com "oot"
+		egrep "^.oot$" american-english
+	Buscar palavras cujo a primeira letra pode ser qualquer letra e em seguida tenha "oot" mais 2 caracteres
+		egrep "^.oot..$" american-english
+	Buscar palavras cujo a primeira letra seja especificada e em seguida tenha "oot" mais 2 caracteres
+		egrep "^[flmr]oot..$" american-english
+	Buscar palavras cujo a primeira letra esteja em um range em seguida tenha "oot" mais 2 caracteres
+		egrep "^[f-r]oot..$" american-english
+
+Editores de texto
+vi
+	Para acessar basta digitar vi e apertar enter
+		vi
+	Para acessar a linha de comando basta digitar dois pontos ":"
+		:
+	Para alternar basta apertar "esc"
+	Para abrir um arquivo
+		vi "arquivo"
+	Inserir informações
+		Pressionar a tecla "i" e digitar a informação desejada
+	Sair sem salvar
+		Pressionar a tecla "esc" e digitar o comando ":q!"
+	Sair salvando
+		Pressionar a tecla "esc" e digitar o comando ":x"		
+	Alterar um caractere
+		Pressionar a tecla "r" e alterar o caractere desejado
+	Salvar o arquivo com outro nome
+		Pressionar a tecla "esc" e digitar o comando ":w edit2.txt"
+	Apagar uma linha
+		Pressionar a tecla "esc" e digitar o comando "dd" na linha a qual deseja excluir
+		O comando "dd" não apaga, ele recorta a linha e deixa na memória.
+	Apagar 5 linhas em sequencia
+		Pressionar a tecla "esc" e digitar o comando "5dd" na linha a qual deseja excluir em sequencia
+	Navegar ate uma determinada linha
+		Pressionar a tecla "esc" e digitar o comando ":20"
+	Ir para o início do arquivo
+		Pressionar a tecla "esc" e digitar o comando "gg"
+	Ir para o fim do arquivo
+		Pressionar a tecla "esc" e digitar o comando "G"
+	Ir para uma determinada linha que comece com um texto especifico
+		Pressionar a tecla "esc" e digitar o comando "/AM" sem dois pontos
+	Recortar a linha corrente e colar no início do arquivo
+		Pressionar a tecla "esc", digitar o comando "dd" na linha corrente,
+		digitar o comando "gg" para ir para o inicio do arquivo,
+		digitar o comando "P (Maiusculo)" para colar antes da linha e 
+		"p (minusculo)" para colar depois da linha
+	Desfazer o último comando, pressionar "u"
+	Copiar algumas linhas para o final do arquivo
+		Posicionar o cursos na primeira linha desejada e 
+		pressionar o comando "4yy", pressionar a tecla "G" para ir ao final do arquivo
+		e pressionar a tecla "p" para colocar as linhas ao final
+		":w" para salvar as alterações
+	Find and Replace
+		Substituir AM por am
+		/AM para ir a uma determinada linha, digitar :s/"o que deseja substituir"/"novo texto"
+		/AM :s/AM/am
+		Substituir todas as ocorrências de AM por am em uma mesma linha
+		/AM :s/AM/am/g
+		Substituir todas as ocorrências de AM por am em todo o arquivo
+		/AM :%s/AM/am/g
